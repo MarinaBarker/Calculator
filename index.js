@@ -7,7 +7,7 @@ const digit = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'];
 const action = ['-', '+', '*', '/', '%'];
 
 //экран
-const out = document.querySelector('.result');
+const result = document.querySelector('.result');
 
 //функция очистки экрана
 function clearAll () {
@@ -15,21 +15,28 @@ function clearAll () {
     b = '';
     sign = '';
     finish = false;
-    out.textContent = 0;
+    result.textContent = 0;
 }
 document.querySelector('.ac').onclick = clearAll;
 
-// Функция для удаления последней цифры  ?
+
+// Функция для удаления последней цифры
 function removeLastDigit() {
-    if (b) {
+    if (finish) {
+        // Если операция завершена, сбрасываем все значения
+        clearAll(); // Сброс состояния завершения
+    } else if (b !== '' && sign !== '') {
+        // Если есть "b" и знак, удаляем последнюю цифру из "b"
         b = b.slice(0, -1);
-        out.textContent = a + ' ' + sign + ' ' + b;
-    } else if (sign) {
-        sign = '';
-    } else {
+    } else if (sign !== '') {
+        // Если есть только "a" и знак, удаляем знак и последнюю цифру из "a"
+        sign = ''; // Удаляем знак
+    } else if (a !== '') {
+        // Если есть только "a", удаляем последнюю цифру из "a"
         a = a.slice(0, -1);
-    }
-    out.textContent = a + ' ' + sign + ' ' + b;
+    } 
+    // Обновляем отображение результата
+    result.textContent = a + ' ' + sign + ' ' + b;
 }
 document.querySelector('.ce').onclick = removeLastDigit;
 
@@ -38,15 +45,18 @@ document.querySelector('.buttons').onclick = (e) => {
     if(!e.target.classList.contains('button')) return;
     //нажата кнопка clearAll 'ac'
     if(e.target.classList.contains('ac')) return;
+    result.textContent = '';
 
-    out.textContent = '';
+    if(e.target.classList.contains('ce'));
+    result.textContent = a + ' ' + sign + ' ' + b;
+    
     //получаем нажатую кнопку
     const key = e.target.textContent;
 
     // Проверка на ввод знака минус в начале
     if (key === '-' && a === '' && sign === '' && b === '') {
         a = '-';
-        out.textContent = a;
+        result.textContent = a;
         return;
     }
 
@@ -55,7 +65,7 @@ document.querySelector('.buttons').onclick = (e) => {
 
         // Проверка на два нуля в начале
         if (key === '0' && (a === '' || a === '0') && sign === '') {
-        out.textContent = '0';
+        result.textContent = '0';
         return; // игнорируем ввод
         }
 
@@ -64,37 +74,38 @@ document.querySelector('.buttons').onclick = (e) => {
             // Если ни a, ни b не заданы, установим 0.
             if (sign === '' && a === '' && b === '') {
                 a = '0.';
-                out.textContent = a;
+                result.textContent = a;
                 return;
             }
             if (sign === '' && a.includes('.') || b.includes('.')) {
+                result.textContent = a;
                 return; // игнорируем ввод
             }
 
             // Если a уже содержит значение, и оно равно 0, просто добавляем .
             if (sign === '' && a === '0') {
                 a += '.';
-                out.textContent = a;
+                result.textContent = a;
                 return;
             }
             // Если b ещё не задано, и знак задан, добавляем '0.' перед '.'
             if (sign !== '' && b === '') {
                 b = '0.';
-                out.textContent = a + ' ' + sign + ' ' + b;
+                result.textContent = a + ' ' + sign + ' ' + b;
                 return;
             }
 
             // Если b уже содержит значение, и оно равно 0, просто добавляем .
             if (sign !== '' && b === '0') {
                 b += '.';
-                out.textContent = a + ' ' + sign + ' ' + b;
+                result.textContent = a + ' ' + sign + ' ' + b;
                 return;
             }
         }
 
         if (b === '' && sign === '') {
         a += key;
-        out.textContent = a;
+        result.textContent = a;
         }
         else if (a!== '' && b!== '' && finish) {
             b = key;
@@ -103,15 +114,14 @@ document.querySelector('.buttons').onclick = (e) => {
         else {
             b+= key;
         }
-        console.log(a, b, sign);
-        out.textContent =  a + sign + b;
+        result.textContent =  a + sign + b;
         return;
     }
 
     //если нажата кнопка + - / *
     if (action.includes(key)) {
         sign = key;
-        out.textContent = a + ' ' + sign + ' ';
+        result.textContent = a + ' ' + sign + ' ';
         return;
     }
 
@@ -130,7 +140,7 @@ document.querySelector('.buttons').onclick = (e) => {
                 break;
             case '/':
                 if (b === '0') {
-                    out.textContent = 'Error!';
+                    result.textContent = 'Error!';
                     a = '';
                     b = '';
                     sign = '';
@@ -143,6 +153,6 @@ document.querySelector('.buttons').onclick = (e) => {
                 break;
         }
         finish = true;
-        out.textContent = a;
+        result.textContent = a;
     }
 }
