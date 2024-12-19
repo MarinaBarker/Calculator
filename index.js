@@ -16,6 +16,7 @@ function clearAll () {
     sign = '';
     finish = false;
     result.textContent = 0;
+    result.style.fontSize = '40px';
 }
 document.querySelector('.ac').onclick = clearAll;
 
@@ -40,15 +41,34 @@ function removeLastDigit() {
 }
 document.querySelector('.ce').onclick = removeLastDigit;
 
+function updateResult() {
+    result.textContent = a + ' ' + sign + ' ' + b;
+    adjustFontSize();
+}
+
+//Функция для обновления результата вывода
+function adjustFontSize() {
+    const containerWidth = 310;
+    const textWidth = result.scrollWidth;
+
+    if (textWidth > containerWidth) {
+        const fontSize = Math.max(12, Math.floor(containerWidth / textWidth * parseInt(window.getComputedStyle(result).fontSize))); // Минимальный размер шрифта 12px
+        result.style.fontSize = fontSize + 'px';
+    } else {
+        result.style.fontSize = '40px'; // Восстановить исходный размер шрифта
+    }
+}
+
+
 document.querySelector('.buttons').onclick = (e) => {
     //нажата не кнопка
     if(!e.target.classList.contains('button')) return;
     //нажата кнопка clearAll 'ac'
     if(e.target.classList.contains('ac')) return;
-    result.textContent = '';
+    updateResult();
 
     if(e.target.classList.contains('ce'));
-    result.textContent = a + ' ' + sign + ' ' + b;
+    updateResult();
     
     //получаем нажатую кнопку
     const key = e.target.textContent;
@@ -62,6 +82,9 @@ document.querySelector('.buttons').onclick = (e) => {
 
     //если нажата кнопка 0-9 или .
     if (digit.includes(key)) {
+
+        // Ограничение длины ввода до 20 символов
+        if ((a + b).length >= 20) return;
 
         // Проверка на два нуля в начале
         if (key === '0' && (a === '' || a === '0') && sign === '') {
@@ -114,14 +137,14 @@ document.querySelector('.buttons').onclick = (e) => {
         else {
             b+= key;
         }
-        result.textContent =  a + sign + b;
+        updateResult();
         return;
     }
 
     //если нажата кнопка + - / *
     if (action.includes(key)) {
         sign = key;
-        result.textContent = a + ' ' + sign + ' ';
+        updateResult();
         return;
     }
 
@@ -154,5 +177,6 @@ document.querySelector('.buttons').onclick = (e) => {
         }
         finish = true;
         result.textContent = a;
+        adjustFontSize();
     }
 }
